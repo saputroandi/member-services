@@ -9,11 +9,12 @@ class App {
 
   constructor() {
     this.app = express();
-    this._config();
+    this._plugins();
     this._routes();
   }
 
-  _config() {
+  _plugins() {
+    this.app.use(express.json());
     this.app.use(helmet());
     this.app.use(cors());
   }

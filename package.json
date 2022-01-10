@@ -10,9 +10,13 @@
   "author": "andi",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
     "express": "^4.17.2",
     "helmet": "^5.0.1",
+    "jsonwebtoken": "^8.5.1",
+    "mysql2": "^2.3.3",
     "sequelize": "^6.12.5"
   },
   "devDependencies": {

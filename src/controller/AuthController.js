@@ -1,8 +1,22 @@
+const User = require("../model/User");
+const ErrorFormatter = require("../helper/ErrorFormatter");
+
 class AuthController {
-  register(req, res, next) {
-    return res.json({
-      data: "hello form register controller",
-    });
+  async register(req, res, next) {
+    const payload = req.body;
+
+    let result = {
+      status: 200,
+    };
+
+    try {
+      result.user = await User.create(payload);
+    } catch (err) {
+      result.error = ErrorFormatter.format(err);
+      result.status = 500;
+    }
+
+    return res.json(result);
   }
 }
 

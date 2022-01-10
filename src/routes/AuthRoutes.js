@@ -11,7 +11,7 @@ class AuthRouter {
   }
 
   _routes() {
-    this._router.get("/register", AuthController.register);
+    this._router.post("/register", AuthController.register);
   }
 }
 
