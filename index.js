@@ -2,7 +2,12 @@ const express = require("express");
 const helmet = require("helmet");
 const cors = require("cors");
 
+const db = require("./src/db/models");
+
 const AuthRoutes = require("./src/routes/AuthRoutes");
+const AuthController = require("./src/controller/AuthController");
+const AuthService = require("./src/services/AuthService");
+const SequelizeUserRepository = require("./src/repositories/SequelizeUserRepository");
 
 class App {
   app;
@@ -26,7 +31,12 @@ class App {
       });
     });
 
-    this.app.use("/auth", AuthRoutes);
+    this.app.use(
+      "/auth",
+      new AuthRoutes(
+        new AuthController(new AuthService(new SequelizeUserRepository(db)))
+      ).router
+    );
   }
 }
 
