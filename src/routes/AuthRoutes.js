@@ -1,22 +1,29 @@
 const Router = require("express").Router;
 
-const AuthController = require("../controller/AuthController");
-
 class AuthRouter {
   router;
   _authController;
+  _authMiddleware;
 
-  constructor(authController) {
+  constructor(authController, authMiddleware = null) {
     this.router = Router();
     this._authController = authController;
+    this._authMiddleware = authMiddleware;
     this._routes();
   }
 
   _routes() {
-    this.router.post("/register", (req, res, next) =>
-      this._authController.registration(req, res, next)
+    this.router.post(
+      "/register",
+      this._authMiddleware.registrationMiddleware(),
+      (req, res, next) => this._authController.registration(req, res, next)
     );
-    // this.router.post("/login", AuthController.login)
+
+    this.router.post(
+      "/login",
+      this._authMiddleware.loginMiddleware(),
+      (req, res, next) => this._authController.login(req, res, next)
+    );
   }
 }
 

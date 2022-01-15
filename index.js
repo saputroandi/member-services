@@ -8,6 +8,7 @@ const AuthRoutes = require("./src/routes/AuthRoutes");
 const AuthController = require("./src/controller/AuthController");
 const AuthService = require("./src/services/AuthService");
 const SequelizeUserRepository = require("./src/repositories/SequelizeUserRepository");
+const AuthMiddleware = require("./src/middleware/AuthMiddleware");
 
 class App {
   app;
@@ -34,7 +35,8 @@ class App {
     this.app.use(
       "/auth",
       new AuthRoutes(
-        new AuthController(new AuthService(new SequelizeUserRepository(db)))
+        new AuthController(new AuthService(new SequelizeUserRepository(db))),
+        new AuthMiddleware(new SequelizeUserRepository(db))
       ).router
     );
   }

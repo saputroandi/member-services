@@ -16,11 +16,11 @@ class SequelizeUserRepository {
     }
   }
 
-  async findOne(email) {
+  async findOne(user) {
     try {
       const result = await this._User.findOne({
         where: {
-          email: email,
+          email: user.email,
         },
       });
 

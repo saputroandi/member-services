@@ -1,7 +1,7 @@
 const ErrorFormatter = require("../helper/ErrorFormatter");
-const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const config = require("../config");
+const { validationResult } = require("express-validator");
 
 class AuthController {
   _authService;
@@ -11,54 +11,52 @@ class AuthController {
   }
 
   async registration(req, res, next) {
-    const payload = req.body;
-
     let result = {
       status: 200,
     };
 
     try {
+      const payload = req.body;
+
+      validationResult(req).throw();
+
       result.user = await this._authService.registration(payload);
     } catch (err) {
-      result.error = ErrorFormatter.format(err);
+      result.error = err.mapped();
       result.status = 500;
     }
 
     return res.status(result.status).json(result);
   }
 
-  // async login(req, res, next) {
-  //   const payload = req.body
+  async login(req, res, next) {
+    const payload = req.body;
+    console.log("asu");
 
-  //   let result = {
-  //     status: 200,
-  //   }
+    let result = {
+      status: 200,
+    };
 
-  //   try {
-  //     const user = await db.User.findOne({ where: { email: payload.email } })
+    try {
+      validationResult(req).throw();
 
-  //     const validPassword = await bcrypt.compare(
-  //       payload.password,
-  //       user.dataValues.password
-  //     )
+      const user = await this._authService.login(payload);
 
-  //     if (!user || !validPassword) {
-  //       return res.status(400).send("Email or password is wrong")
-  //     }
+      const token = jwt.sign(user.dataValues, config.SECRET_KEY);
 
-  //     delete user.dataValues.password
+      result.user = user;
+      result.token = token;
+    } catch (err) {
+      if (err instanceof ErrorFormatter) {
+        result.error = err;
+      } else {
+        result.error = err.mapped();
+      }
+      result.status = 500;
+    }
 
-  //     const token = jwt.sign(user.dataValues, config.SECRET_KEY)
-
-  //     result.user = user
-  //     result.token = token
-  //   } catch (err) {
-  //     result.error = ErrorFormatter.format(err)
-  //     result.status = 500
-  //   }
-
-  //   return res.status(result.status).json(result)
-  // }
+    return res.status(result.status).json(result);
+  }
 }
 
 module.exports = AuthController;

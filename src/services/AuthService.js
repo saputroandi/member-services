@@ -1,3 +1,6 @@
+const bcrypt = require("bcrypt");
+const ErrorFormatter = require("../helper/ErrorFormatter");
+
 class AuthService {
   _userRepository;
 
@@ -6,40 +9,31 @@ class AuthService {
   }
 
   async registration(user) {
-    const validUser = this._isValidRegistrationUser(user);
-
-    const result = await this._userRepository.save(validUser);
+    const result = await this._userRepository.save(user);
 
     return result;
   }
 
-  _isValidRegistrationUser(user) {
-    // const schema = Joi.object({
-    //   password: Joi.string().required().min(6).max(64),
-    //   email: Joi.string()
-    //     .required()
-    //     .email()
-    //     .custom((email, helper) => {
-    //       const result = this._userRepository.findOne(email).then((email) => {
-    //         return helper.message("email has been taken");
-    //       });
+  async login(user) {
+    const resultUser = await this._userRepository.findOne(user);
 
-    // if (result) return helper.message("email has been taken");
+    const validPassword = await bcrypt.compare(
+      user.password,
+      resultUser.dataValues.password
+    );
 
-    //   return email;
-    // }),
-    // .messages({
-    //   "any.custom": "paul lu",
-    // }),
-    // });
+    if (!resultUser || !validPassword) {
+      throw new ErrorFormatter(
+        user.email,
+        "email or password is wrong",
+        "password",
+        "body"
+      );
+    }
 
-    // const { error } = schema.validateAsync(user);
+    delete resultUser.dataValues.password;
 
-    // if (error) throw new ValidationError(error.message);
-
-    // return user;
-
-    return user;
+    return resultUser;
   }
 }
 
