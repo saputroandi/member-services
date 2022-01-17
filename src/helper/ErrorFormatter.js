@@ -9,7 +9,9 @@ class ErrorFormatter {
     this.msg = msg;
     this.param = param;
     this.location = location;
+    this.format();
   }
+
   format() {
     let error = {};
 

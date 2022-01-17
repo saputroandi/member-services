@@ -2,6 +2,8 @@ const ErrorFormatter = require("../helper/ErrorFormatter");
 const jwt = require("jsonwebtoken");
 const config = require("../config");
 const { validationResult } = require("express-validator");
+var amqp = require("amqplib/callback_api");
+// const MailServices = require("../services/MailServices");
 
 class AuthController {
   _authService;
@@ -15,12 +17,23 @@ class AuthController {
       status: 200,
     };
 
+    // const mail = new MailServices();
+
     try {
-      const payload = req.body;
+      const user = req.body;
+      // const mailData = {
+      //   user: payload,
+      //   subject: "test mail",
+      //   text: "test mail",
+      // };
+
+      // await mail.sendMail(mailData);
 
       validationResult(req).throw();
 
-      result.user = await this._authService.registration(payload);
+      // this._queueEmailJobs(user);
+
+      result.user = await this._authService.registration(user);
     } catch (err) {
       result.error = err.mapped();
       result.status = 500;
@@ -31,7 +44,6 @@ class AuthController {
 
   async login(req, res, next) {
     const payload = req.body;
-    console.log("asu");
 
     let result = {
       status: 200,
@@ -56,6 +68,27 @@ class AuthController {
     }
 
     return res.status(result.status).json(result);
+  }
+
+  _queueEmailJobs(user) {
+    amqp.connect("amqp://localhost", (err0, connection) => {
+      if (err0) throw err0;
+
+      connection.createChannel((err1, channel) => {
+        if (err1) throw err1;
+
+        const queue = "email_verification";
+        const message = JSON.stringify(user);
+
+        channel.assertQueue(queue, {
+          durable: false,
+        });
+
+        channel.sendToQueue(queue, Buffer.from(message));
+
+        console.log(" [x] Sent %s", message);
+      });
+    });
   }
 }
 

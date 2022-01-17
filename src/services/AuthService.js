@@ -24,7 +24,7 @@ class AuthService {
 
     if (!resultUser || !validPassword) {
       throw new ErrorFormatter(
-        user.email,
+        user.password,
         "email or password is wrong",
         "password",
         "body"
