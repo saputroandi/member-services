@@ -13,6 +13,10 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      User.hasOne(models.EmailToken, {
+        foreignKey: "user_id",
+        onDelete: "CASCADE",
+      });
     }
   }
 
@@ -42,6 +46,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         afterCreate: (user, options) => {
           delete user.dataValues.password;
+          delete user.dataValues.EmailToken;
         },
       },
     }

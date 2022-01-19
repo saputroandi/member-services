@@ -8,14 +8,22 @@ class AuthService {
     this._userRepository = userRepository;
   }
 
-  async registration(user) {
-    const result = await this._userRepository.save(user);
+  async registration(user, token) {
+    console.log(
+      " [x]  Registering user use registration method AuthServices :",
+      user
+    );
+
+    const result = await this._userRepository.createUserWithEmailToken(
+      user,
+      token
+    );
 
     return result;
   }
 
   async login(user) {
-    const resultUser = await this._userRepository.findOne(user);
+    const resultUser = await this._userRepository.findOneUser(user);
 
     const validPassword = await bcrypt.compare(
       user.password,
@@ -34,6 +42,17 @@ class AuthService {
     delete resultUser.dataValues.password;
 
     return resultUser;
+  }
+
+  async verifyEmailCodeAndUpdateUserEmailStatus(emailToken) {
+    console.log(
+      " [x]  Validating user email using verificationEmail method AuthServices: ",
+      emailToken
+    );
+
+    const result = await this._userRepository.findEmailTokenAndUser(emailToken);
+
+    return result;
   }
 }
 

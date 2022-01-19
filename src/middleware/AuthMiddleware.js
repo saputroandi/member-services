@@ -25,7 +25,9 @@ class AuthMiddleware {
         },
         custom: {
           options: async (email, { req, location, path }) => {
-            const result = await this._userRepository.findOne(req.body);
+            console.log("hit");
+            const result = await this._userRepository.findOneUser(req.body);
+            console.log(result);
             if (result && result.dataValues)
               throw new Error("email already in use");
           },
@@ -71,7 +73,7 @@ class AuthMiddleware {
         },
         custom: {
           options: async (email, { req, location, path }) => {
-            const result = await this._userRepository.findOne(req.body);
+            const result = await this._userRepository.findOneUser(req.body);
             if (!result || !result.dataValues) {
               throw new Error("email or password is wrong");
             }

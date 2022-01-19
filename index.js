@@ -4,6 +4,8 @@ const cors = require("cors");
 
 const db = require("./src/db/models");
 
+const MailServices = require("./src/services/MailServices");
+
 const AuthRoutes = require("./src/routes/AuthRoutes");
 const AuthController = require("./src/controller/AuthController");
 const AuthService = require("./src/services/AuthService");
@@ -17,12 +19,17 @@ class App {
     this.app = express();
     this._plugins();
     this._routes();
+    this._jobsServices();
   }
 
   _plugins() {
     this.app.use(express.json());
     this.app.use(helmet());
     this.app.use(cors());
+  }
+
+  _jobsServices() {
+    new MailServices();
   }
 
   _routes() {

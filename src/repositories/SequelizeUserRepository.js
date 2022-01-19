@@ -1,22 +1,45 @@
 class SequelizeUserRepository {
   _User;
+  _EmailToken;
 
   constructor(db) {
     this._User = db.User;
+    this._EmailToken = db.EmailToken;
   }
 
-  async save(user) {
+  // async save(user) {
+  //   try {
+  //     const result = await this._User.create(user);
+
+  //     return result;
+  //   } catch (err) {
+  //     console.log(err);
+  //     throw new Error("cant save user");
+  //   }
+  // }
+
+  async createUserWithEmailToken(user, token) {
     try {
-      const result = await this._User.create(user);
+      const EmailToken = this._EmailToken;
+
+      const result = await this._User.create(
+        {
+          ...user,
+          EmailToken: {
+            token: token,
+          },
+        },
+        { include: EmailToken }
+      );
 
       return result;
     } catch (err) {
       console.log(err);
-      throw new Error("cant query to db");
+      throw new Error("cant save user with token");
     }
   }
 
-  async findOne(user) {
+  async findOneUser(user) {
     try {
       const result = await this._User.findOne({
         where: {
@@ -26,7 +49,24 @@ class SequelizeUserRepository {
 
       return result;
     } catch (err) {
-      throw new Error("cant query to db");
+      throw new Error("cant find user");
+    }
+  }
+
+  async findEmailTokenAndUser(emailToken) {
+    try {
+      const User = this._User;
+
+      const result = await this._EmailToken.findOne({
+        where: {
+          token: emailToken.token,
+        },
+        include: User,
+      });
+
+      return result;
+    } catch (err) {
+      throw new Error("cant find user");
     }
   }
 }
