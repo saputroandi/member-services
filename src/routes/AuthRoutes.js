@@ -25,8 +25,10 @@ class AuthRouter {
       (req, res, next) => this._authController.login(req, res, next)
     );
 
-    this.router.post("/email-validation", (req, res, next) =>
-      this._authController.emailVerification(req, res, next)
+    this.router.post(
+      "/email-validation",
+      this._authMiddleware.emailVerificationMiddleware(),
+      (req, res, next) => this._authController.emailVerification(req, res, next)
     );
   }
 }

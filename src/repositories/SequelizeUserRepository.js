@@ -69,6 +69,20 @@ class SequelizeUserRepository {
       throw new Error("cant find user");
     }
   }
+
+  async updateUser(objPayload, user) {
+    try {
+      const result = await this._User.update(objPayload, {
+        where: {
+          email: user.email,
+        },
+      });
+
+      return result;
+    } catch (err) {
+      throw new Error("cant update user");
+    }
+  }
 }
 
 module.exports = SequelizeUserRepository;

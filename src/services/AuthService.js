@@ -1,5 +1,5 @@
 const bcrypt = require("bcrypt");
-const ErrorFormatter = require("../helper/ErrorFormatter");
+const ErrorFormatter = require("../helper/ErrorFormatter.js");
 
 class AuthService {
   _userRepository;
@@ -46,11 +46,32 @@ class AuthService {
 
   async verifyEmailCodeAndUpdateUserEmailStatus(emailToken) {
     console.log(
-      " [x]  Validating user email using verificationEmail method AuthServices: ",
+      ` [x]  Verifying user email using verificationEmail method AuthServices: `,
       emailToken
     );
 
-    const result = await this._userRepository.findEmailTokenAndUser(emailToken);
+    const userTokenResult = await this._userRepository.findEmailTokenAndUser(
+      emailToken
+    );
+
+    if (!userTokenResult)
+      throw new ErrorFormatter(
+        userTokenResult,
+        "invalid token",
+        "token",
+        "body"
+      );
+
+    const payload = { is_verified: true };
+
+    const updatedResult = await this._userRepository.updateUser(
+      payload,
+      userTokenResult.User.dataValues
+    );
+
+    let result;
+
+    updatedResult.forEach((val) => (result = val));
 
     return result;
   }

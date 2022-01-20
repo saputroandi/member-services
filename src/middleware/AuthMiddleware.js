@@ -48,7 +48,7 @@ class AuthMiddleware {
           errorMessage: "password min 6 character and max 64 character",
           options: {
             min: 6,
-            max: 64,
+            max: 40,
           },
         },
       },
@@ -96,6 +96,30 @@ class AuthMiddleware {
           options: {
             min: 6,
             max: 64,
+          },
+        },
+      },
+    });
+  }
+
+  emailVerificationMiddleware() {
+    return checkSchema({
+      token: {
+        in: ["body"],
+        isString: {
+          errorMessage: "its supposed to be string",
+        },
+        notEmpty: {
+          errorMessage: "its not supposed to be empty",
+          options: {
+            ignore_whitespace: true,
+          },
+        },
+        isLength: {
+          errorMessage: "token should be 16 character long",
+          options: {
+            min: 16,
+            max: 50,
           },
         },
       },

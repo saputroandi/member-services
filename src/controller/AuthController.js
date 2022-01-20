@@ -1,8 +1,8 @@
-const ErrorFormatter = require("../helper/ErrorFormatter");
+const ErrorFormatter = require("../helper/ErrorFormatter.js");
 const jwt = require("jsonwebtoken");
 const config = require("../config");
 const { validationResult, Result } = require("express-validator");
-var amqp = require("amqplib/callback_api");
+const amqp = require("amqplib/callback_api");
 const { v4: uuidv4 } = require("uuid");
 
 class AuthController {
@@ -30,7 +30,7 @@ class AuthController {
       const mailData = {
         user: user,
         subject: "Verification Code from Ganti",
-        text: `Please enter the code ${token} to verify your account.`,
+        text: `Please enter this code to verify your account: ${token}`,
       };
 
       validationResult(req).throw();
@@ -89,20 +89,25 @@ class AuthController {
     };
 
     try {
-      // validationResult(req).throw();
+      validationResult(req).throw();
 
-      const user =
+      const userUpdated =
         await this._authService.verifyEmailCodeAndUpdateUserEmailStatus(
           emailToken
         );
 
-      result.user = user;
+      result.user = userUpdated;
+
+      if (userUpdated) {
+        result.message = "User Verified";
+      } else {
+        result.message = "Verified error";
+      }
     } catch (err) {
       if (err instanceof ErrorFormatter) {
         result.error = err;
       } else {
-        console.log(err);
-        // result.error = err.mapped();
+        result.error = err.mapped();
       }
       result.status = 500;
     }
