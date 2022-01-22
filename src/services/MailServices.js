@@ -1,5 +1,6 @@
 const nodemailer = require("nodemailer");
 const amqp = require("amqplib/callback_api");
+const config = require("../config");
 
 class MailServices {
   transporter;
@@ -10,31 +11,34 @@ class MailServices {
   }
 
   consumeJobs() {
-    amqp.connect("amqp://localhost", (err0, connection) => {
-      if (err0) throw err0;
+    amqp.connect(
+      `amqp://guest:guest@${config.MESSAGE_BROKER_HOST}`,
+      (err0, connection) => {
+        if (err0) throw err0;
 
-      connection.createChannel((err1, channel) => {
-        if (err1) throw err1;
+        connection.createChannel((err1, channel) => {
+          if (err1) throw err1;
 
-        const queue = "email_verification";
+          const queue = "email_verification";
 
-        channel.assertQueue(queue, {
-          durable: false,
+          channel.assertQueue(queue, {
+            durable: false,
+          });
+
+          channel.consume(
+            queue,
+            async (payload) => {
+              const payloadObj = JSON.parse(payload.content.toString());
+              await this.sendMail(payloadObj);
+              console.log(" [x]  Consume mail jobs and send it");
+            },
+            {
+              noAck: true,
+            }
+          );
         });
-
-        channel.consume(
-          queue,
-          async (payload) => {
-            const payloadObj = JSON.parse(payload.content.toString());
-            await this.sendMail(payloadObj);
-            console.log(" [x]  Consume mail jobs and send it");
-          },
-          {
-            noAck: true,
-          }
-        );
-      });
-    });
+      }
+    );
   }
 
   async sendMail(payload) {

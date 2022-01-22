@@ -118,34 +118,37 @@ class AuthController {
   _queueEmailJobs(mailData) {
     console.log(" [x]  Sending jobs to email verification channel");
 
-    amqp.connect("amqp://localhost", (err0, connection) => {
-      console.log(" [x]  Connected to message browser");
+    amqp.connect(
+      `amqp://guest:guest@${config.MESSAGE_BROKER_HOST}`,
+      (err0, connection) => {
+        console.log(" [x]  Connected to message browser");
 
-      if (err0) throw err0;
+        if (err0) throw err0;
 
-      connection.createChannel((err1, channel) => {
-        console.log(" [x]  Created channel jobs email verification");
+        connection.createChannel((err1, channel) => {
+          console.log(" [x]  Created channel jobs email verification");
 
-        if (err1) throw err1;
+          if (err1) throw err1;
 
-        const queue = "email_verification";
-        const payload = JSON.stringify(mailData);
+          const queue = "email_verification";
+          const payload = JSON.stringify(mailData);
 
-        console.log(" [x]  Convert to string", payload);
+          console.log(" [x]  Convert to string", payload);
 
-        channel.assertQueue(queue, {
-          durable: false,
+          channel.assertQueue(queue, {
+            durable: false,
+          });
+
+          channel.sendToQueue(queue, Buffer.from(payload));
+
+          console.log(" [x]  Send jobs to email verification channel");
         });
 
-        channel.sendToQueue(queue, Buffer.from(payload));
-
-        console.log(" [x]  Send jobs to email verification channel");
-      });
-
-      setTimeout(function () {
-        connection.close();
-      }, 1000);
-    });
+        setTimeout(function () {
+          connection.close();
+        }, 1000);
+      }
+    );
   }
 }
 

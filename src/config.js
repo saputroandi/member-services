@@ -3,8 +3,8 @@ dotenv.config();
 
 class Config {
   SECRET_KEY;
+  MESSAGE_BROKER_HOST;
   DB_HOST;
-  DB_DIALECT;
   DB_NAME;
   DB_USERNAME;
   DB_PASSWORD;
@@ -15,8 +15,9 @@ class Config {
 
   _getConfiguration() {
     this.SECRET_KEY = process.env.SECRET_KEY;
+    this.MESSAGE_BROKER_HOST = process.env.MESSAGE_BROKER_HOST;
+    this.APP_PORT = process.env.APP_PORT;
     this.DB_HOST = process.env.DB_HOST;
-    this.DB_DIALECT = process.env.DB_DIALECT;
     this.DB_NAME = process.env.DB_NAME;
     this.DB_USERNAME = process.env.DB_USERNAME;
     this.DB_PASSWORD = process.env.DB_PASSWORD;

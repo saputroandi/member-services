@@ -1,6 +1,7 @@
 const express = require("express");
 const helmet = require("helmet");
 const cors = require("cors");
+const config = require("./src/config");
 
 const db = require("./src/db/models");
 
@@ -49,9 +50,8 @@ class App {
   }
 }
 
-const port = 3000;
 const app = new App().app;
 
-app.listen(port, () => {
-  console.log(`App listening on port ${port}`);
+app.listen(config.APP_PORT, () => {
+  console.log(`App listening on port ${config.APP_PORT}`);
 });
